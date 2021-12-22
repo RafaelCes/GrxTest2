@@ -1,4 +1,10 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using GrxTest2.Data;
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<GrxTest2Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GrxTest2Context")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
