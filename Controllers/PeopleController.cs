@@ -23,7 +23,10 @@ namespace GrxTest2.Controllers
         // GET: People
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Person.ToListAsync());
+            var person = from p in _context.Person select p;
+            person = person.Where(p => p.Active == true);
+
+            return View(await person.ToListAsync());
         }
 
         // GET: People/Details/5
@@ -36,7 +39,7 @@ namespace GrxTest2.Controllers
 
             var person = await _context.Person
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (person == null)
+            if (person == null || person.Active == false)
             {
                 return NotFound();
             }
@@ -55,7 +58,7 @@ namespace GrxTest2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,BirthDate,Active")] Person person)
+        public async Task<IActionResult> Create([Bind("Id,Name,BirthDate")] Person person)
         {
             if (ModelState.IsValid)
             {
@@ -75,7 +78,7 @@ namespace GrxTest2.Controllers
             }
 
             var person = await _context.Person.FindAsync(id);
-            if (person == null)
+            if (person == null || person.Active == false)
             {
                 return NotFound();
             }
@@ -87,7 +90,7 @@ namespace GrxTest2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BirthDate,Active")] Person person)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BirthDate")] Person person)
         {
             if (id != person.Id)
             {
@@ -127,7 +130,7 @@ namespace GrxTest2.Controllers
 
             var person = await _context.Person
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (person == null)
+            if (person == null || person.Active == false)
             {
                 return NotFound();
             }
@@ -141,7 +144,12 @@ namespace GrxTest2.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var person = await _context.Person.FindAsync(id);
-            _context.Person.Remove(person);
+            if (person != null)
+            {
+                person.Active = false;
+  
+            }
+            // _context.Person.Remove(person);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
