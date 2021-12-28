@@ -21,10 +21,35 @@ namespace GrxTest2.Controllers
         }
 
         // GET: People
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentFilter"] = searchString;
+
             var person = from p in _context.Person select p;
             person = person.Where(p => p.Active == true);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                person = person.Where(p => p.Name.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    person = person.OrderByDescending(p => p.Name);
+                    break;
+                case "Date":
+                    person = person.OrderBy(p => p.BirthDate);
+                    break;
+                case "date_desc":
+                    person = person.OrderByDescending(p => p.Name);
+                    break;
+                default:
+                    person = person.OrderBy(p => p.BirthDate);
+                    break;
+            }
 
             return View(await person.ToListAsync());
         }

@@ -14,5 +14,18 @@ namespace GrxTest2.Models
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
         public Boolean Active { get; set; } = true;
+        [Display(Name = "Faixa Etaria")]
+        public string AgeGroup
+        {
+            get
+            {
+                int age = DateTime.Now.Year - BirthDate.Year;
+                if (age < 10) return "0 - 9";
+                if (age < 20) return "10 - 19";
+                if (age < 30) return "20 - 29";
+                if (age < 40) return "30 - 39";
+                else return "50+";
+            }
+        }
     }
 }
